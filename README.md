@@ -1,9 +1,8 @@
 # Simulador de Uso de Suelo - PokTaPok 🌴
 
-[![Estado de despliegue](https://github.com/TU-USUARIO/TU-REPO/actions/workflows/pages/build/badge.svg)](https://github.com/TU-USUARIO/TU-REPO/actions)
-![Estado del sitio web](https://img.shields.io/website?url=https%3A%2F%2FTU-USUARIO.github.io%2FTU-REPO)
+[![Estado de despliegue](https://github.com/paakto/poktapok-app/actions/workflows/pages/build/badge.svg)](https://github.com/paakto/poktapok-app/actions)
+![Estado del sitio web](https://img.shields.io/website?url=https%3A%2F%2Fpaakto.github.io%2Fpoktapok-app)
 
-*Nota: Reemplaza `TU-USUARIO` y `TU-REPO` en los enlaces de las etiquetas (badges) de arriba con los nombres reales de tu cuenta y repositorio en GitHub.*
 
 ---
 
