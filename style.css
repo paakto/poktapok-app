@@ -1,0 +1,203 @@
+/* Variables de color y estilos base */
+:root {
+    --color-bg-sidebar: #f8f9fa;
+    --color-text-main: #333333;
+    --color-text-muted: #666666;
+    --color-border: #e0e0e0;
+    
+    /* Colores de marca y alertas */
+    --color-green: #36b4a1;
+    --color-magenta: #e3057f;
+    
+    --font-main: 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+}
+
+* {
+    box-sizing: border-box;
+    margin: 0;
+    padding: 0;
+}
+
+body {
+    font-family: var(--font-main);
+    color: var(--color-text-main);
+    overflow: hidden; /* Evitar scroll en la ventana completa */
+}
+
+/* Layout principal */
+.app-container {
+    display: flex;
+    height: 100vh;
+    width: 100vw;
+}
+
+/* Panel Lateral (Sidebar) */
+.sidebar {
+    width: 380px;
+    min-width: 380px;
+    background-color: var(--color-bg-sidebar);
+    border-right: 1px solid var(--color-border);
+    display: flex;
+    flex-direction: column;
+    padding: 24px;
+    overflow-y: auto;
+    box-shadow: 2px 0 5px rgba(0,0,0,0.05);
+    z-index: 1000; /* Para estar sobre el mapa de Leaflet */
+}
+
+.sidebar header {
+    margin-bottom: 24px;
+    border-bottom: 2px solid var(--color-border);
+    padding-bottom: 16px;
+}
+
+.sidebar h1 {
+    font-size: 24px;
+    font-weight: 700;
+    margin-bottom: 4px;
+}
+
+.subtitle {
+    font-size: 14px;
+    color: var(--color-text-muted);
+}
+
+/* Grupos de controles */
+.control-group {
+    margin-bottom: 28px;
+}
+
+.control-group h2 {
+    font-size: 16px;
+    margin-bottom: 8px;
+    color: var(--color-text-main);
+}
+
+.instruction {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-bottom: 12px;
+}
+
+/* Botones de herramientas */
+.tool-buttons {
+    display: flex;
+    gap: 10px;
+    margin-bottom: 12px;
+}
+
+.tool-btn {
+    flex: 1;
+    padding: 10px;
+    border: 1px solid var(--color-border);
+    background: #ffffff;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+    transition: all 0.2s;
+}
+
+.tool-btn:hover {
+    background: #f0f0f0;
+}
+
+.tool-btn.active {
+    background: var(--color-text-main);
+    color: #ffffff;
+    border-color: var(--color-text-main);
+}
+
+.action-btn {
+    width: 100%;
+    padding: 10px;
+    background: transparent;
+    border: 1px dashed var(--color-text-muted);
+    color: var(--color-text-muted);
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 13px;
+}
+
+.action-btn:hover {
+    background: #f0f0f0;
+    color: var(--color-text-main);
+}
+
+/* Slider */
+.slider-container {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    margin-bottom: 8px;
+}
+
+.slider-container input[type="range"] {
+    flex: 1;
+    accent-color: var(--color-text-main);
+}
+
+.slider-label {
+    font-size: 12px;
+    font-weight: bold;
+    color: var(--color-text-muted);
+}
+
+.slider-value {
+    font-size: 14px;
+    text-align: center;
+}
+
+/* Indicadores (KPIs) */
+.kpi-group {
+    margin-top: auto; /* Empuja los KPIs hacia abajo */
+}
+
+.kpi-group h2 {
+    font-size: 16px;
+    margin-bottom: 16px;
+    padding-top: 16px;
+    border-top: 2px solid var(--color-border);
+}
+
+.kpi-card {
+    background: #ffffff;
+    border: 1px solid var(--color-border);
+    border-radius: 8px;
+    padding: 16px;
+    margin-bottom: 12px;
+}
+
+.kpi-card h3 {
+    font-size: 13px;
+    color: var(--color-text-muted);
+    margin-bottom: 8px;
+    font-weight: normal;
+}
+
+.kpi-value {
+    font-size: 24px;
+    font-weight: 700;
+}
+
+.kpi-desc {
+    font-size: 11px;
+    color: var(--color-text-muted);
+    margin-top: 4px;
+}
+
+/* Alertas de colores institucionales */
+.kpi-value.warning, .kpi-value.danger {
+    color: var(--color-magenta);
+}
+
+#kpi-green-area {
+    color: var(--color-green);
+}
+
+/* Mapa */
+.map-container {
+    flex: 1;
+    background-color: #e5e5e5;
+    position: relative;
+    z-index: 1;
+}

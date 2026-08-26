@@ -1,0 +1,72 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Simulador de Uso de Suelo - PokTaPok</title>
+    <!-- Leaflet CSS -->
+    <link rel="stylesheet" href="https://unpkg.com/leaflet@1.9.4/dist/leaflet.css" />
+    <!-- Hoja de estilos personalizada -->
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div class="app-container">
+        <!-- Panel Lateral (Controles e Indicadores) -->
+        <aside class="sidebar">
+            <header>
+                <h1>Simulador PokTaPok</h1>
+                <p class="subtitle">Evaluación de cambio de uso de suelo</p>
+            </header>
+
+            <section class="control-group">
+                <h2>1. Herramientas de Selección</h2>
+                <p class="instruction">Selecciona las áreas verdes que pasarán a ser urbanas:</p>
+                <div class="tool-buttons">
+                    <button id="btn-click" class="tool-btn active">👆 Selección Individual</button>
+                    <button id="btn-brush" class="tool-btn">🖌️ Selección por Brocha</button>
+                </div>
+                <button id="btn-reset" class="action-btn">↺ Reiniciar Simulación</button>
+            </section>
+
+            <section class="control-group">
+                <h2>2. Densidad de Nueva Vivienda</h2>
+                <p class="instruction">Viviendas por hectárea en las nuevas zonas urbanas:</p>
+                <div class="slider-container">
+                    <span class="slider-label">10</span>
+                    <input type="range" id="density-slider" min="10" max="70" value="30" step="1">
+                    <span class="slider-label">70</span>
+                </div>
+                <div class="slider-value">Densidad actual: <strong id="density-value">30</strong> viv/ha</div>
+            </section>
+
+            <section class="kpi-group">
+                <h2>3. Impacto de la Simulación</h2>
+                
+                <div class="kpi-card">
+                    <h3>Área verde por habitante</h3>
+                    <div class="kpi-value"><span id="kpi-green-area">--</span> m² / hab</div>
+                    <p class="kpi-desc">Parámetro actual vs. proyectado</p>
+                </div>
+
+                <div class="kpi-card alert-zone">
+                    <h3>Superficie construida en zona inundable</h3>
+                    <div class="kpi-value warning"><span id="kpi-flood-area">0</span> m²</div>
+                </div>
+
+                <div class="kpi-card alert-zone">
+                    <h3>Pérdida de Manglar (Área protegida)</h3>
+                    <div class="kpi-value danger"><span id="kpi-mangrove-lost">0</span> m²</div>
+                </div>
+            </section>
+        </aside>
+
+        <!-- Contenedor del Mapa -->
+        <main id="map" class="map-container"></main>
+    </div>
+
+    <!-- Leaflet JS -->
+    <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
+    <!-- Lógica de la aplicación -->
+    <!-- <script src="app.js"></script> -->
+</body>
+</html>
