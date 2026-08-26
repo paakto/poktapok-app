@@ -1,9 +1,10 @@
 // ==========================================
 // 1. CONFIGURACIÓN Y CONSTANTES
 // ==========================================
-const AREA_HEX_M2 = 2500; // Ejemplo: ajusta esto al área real de tus hexágonos
+// cellsize = 40m en R produce hexágonos regulares con área = (sqrt(3)/2) * 40^2 ≈ 1385.64 m² (0.1385 ha)
+const AREA_HEX_M2 = 1385.64;
 const HAB_POR_VIVIENDA = 3.2;
-const POBLACION_ACTUAL_URBANA = 8500; // Ajusta a la población actual de PokTaPok
+const POBLACION_ACTUAL_URBANA = 8500; // Población base actual de PokTaPok
 
 // Paleta de colores institucionales
 const COLORES = {
@@ -16,7 +17,8 @@ const COLORES = {
 let estadoSimulacion = {
     densidad: 30,
     modoBrocha: false,
-    mousePresionado: false
+    mousePresionado: false,
+    pincelEstadoObjetivo: 'urbanizado'
 };
 
 // ==========================================
@@ -47,18 +49,18 @@ function obtenerEstiloHexagono(feature) {
     // Si ya era urbano originalmente
     if (feature.properties.tipo_actual === 'urbano') {
         colorFondo = COLORES.urbano_existente;
-        opacidad = 0.4;
+        opacidad = 0.45;
     }
     // Si era verde pero el usuario lo ha "urbanizado" en la simulación
     else if (feature.properties.estado_simulacion === 'urbanizado') {
         colorFondo = COLORES.impacto_nuevo;
-        opacidad = 0.7; // Un poco más opaco para resaltar el impacto
+        opacidad = 0.75; // Resaltar el impacto de desarrollo
     }
-    // Variaciones sutiles para los tipos de verde (opcional)
+    // Variaciones visuales para los tipos de verde originales
     else if (feature.properties.tipo_actual === 'verde_manglar') {
-        opacidad = 0.65;
+        opacidad = 0.70;
     } else if (feature.properties.tipo_actual === 'verde_inundable') {
-        opacidad = 0.4;
+        opacidad = 0.40;
     }
 
     return {
@@ -73,6 +75,8 @@ function obtenerEstiloHexagono(feature) {
 // 4. LÓGICA DE CÁLCULO E INDICADORES
 // ==========================================
 function recalcularImpacto() {
+    if (!capaHexagonos) return;
+
     let areaVerdeRestante = 0;
     let nuevosHabitantesTotales = 0;
     let perdidaManglar = 0;
@@ -88,11 +92,11 @@ function recalcularImpacto() {
                 const nuevasViviendas = areaHectareas * estadoSimulacion.densidad;
                 nuevosHabitantesTotales += (nuevasViviendas * HAB_POR_VIVIENDA);
 
-                // Acumular impactos negativos
+                // Acumular impactos negativos específicos
                 if (props.tipo_actual === 'verde_manglar') perdidaManglar += AREA_HEX_M2;
                 if (props.tipo_actual === 'verde_inundable') areaInundableConstruida += AREA_HEX_M2;
             } else {
-                // Si sigue siendo verde, suma al área verde total
+                // Si sigue siendo verde, suma al área verde total disponible
                 areaVerdeRestante += AREA_HEX_M2;
             }
         }
@@ -102,98 +106,167 @@ function recalcularImpacto() {
     const m2VerdePorHabitante = poblacionTotalProyectada > 0 ? (areaVerdeRestante / poblacionTotalProyectada) : 0;
 
     // Actualizar la Interfaz (DOM)
-    document.getElementById('kpi-green-area').innerText = m2VerdePorHabitante.toFixed(1);
-    document.getElementById('kpi-flood-area').innerText = areaInundableConstruida.toLocaleString();
-    document.getElementById('kpi-mangrove-lost').innerText = perdidaManglar.toLocaleString();
+    const greenEl = document.getElementById('kpi-green-area');
+    const floodEl = document.getElementById('kpi-flood-area');
+    const mangroveEl = document.getElementById('kpi-mangrove-lost');
+
+    if (greenEl) greenEl.innerText = m2VerdePorHabitante.toFixed(1);
+    if (floodEl) floodEl.innerText = Math.round(areaInundableConstruida).toLocaleString();
+    if (mangroveEl) mangroveEl.innerText = Math.round(perdidaManglar).toLocaleString();
 }
 
 // ==========================================
 // 5. INTERACCIONES (CLIC Y BROCHA)
 // ==========================================
-function alternarEstadoHexagono(layer) {
+function aplicarEstadoHexagono(layer, nuevoEstado) {
     const props = layer.feature.properties;
-    // Evitar alterar lo que ya era urbano desde el inicio
-    if (props.tipo_actual === 'urbano') return;
+    if (props.tipo_actual === 'urbano') return; // Inmutable si ya es urbano base
 
-    // Alternar estado
-    props.estado_simulacion = (props.estado_simulacion === 'original') ? 'urbanizado' : 'original';
-
-    // Actualizar color y recalcular
+    props.estado_simulacion = nuevoEstado;
     layer.setStyle(obtenerEstiloHexagono(layer.feature));
     recalcularImpacto();
 }
 
-function onEachFeature(feature, layer) {
-    // Inicializar estado de simulación
-    feature.properties.estado_simulacion = 'original';
+function alternarEstadoHexagono(layer) {
+    const props = layer.feature.properties;
+    if (props.tipo_actual === 'urbano') return;
 
-    // Evento de Clic estándar
-    layer.on('mousedown', () => {
-        alternarEstadoHexagono(layer);
+    const siguienteEstado = (props.estado_simulacion === 'urbanizado') ? 'original' : 'urbanizado';
+    aplicarEstadoHexagono(layer, siguienteEstado);
+    return siguienteEstado;
+}
+
+function onEachFeature(feature, layer) {
+    // Inicializar estado de simulación si no existe
+    if (!feature.properties.estado_simulacion) {
+        feature.properties.estado_simulacion = 'original';
+    }
+
+    // Evento de Clic o inicio de brocha
+    layer.on('mousedown', (e) => {
+        if (feature.properties.tipo_actual === 'urbano') return;
+
+        if (estadoSimulacion.modoBrocha) {
+            // Establece el estado objetivo según el hexágono inicial
+            estadoSimulacion.mousePresionado = true;
+            estadoSimulacion.pincelEstadoObjetivo = (feature.properties.estado_simulacion === 'urbanizado') ? 'original' : 'urbanizado';
+            aplicarEstadoHexagono(layer, estadoSimulacion.pincelEstadoObjetivo);
+        } else {
+            alternarEstadoHexagono(layer);
+        }
+        L.DomEvent.stopPropagation(e);
     });
 
-    // Lógica para la "Brocha" (pasar el ratón mientras se hace clic)
+    // Lógica para la brocha al pasar el ratón
     layer.on('mouseover', () => {
         if (estadoSimulacion.modoBrocha && estadoSimulacion.mousePresionado) {
-            alternarEstadoHexagono(layer);
+            if (feature.properties.tipo_actual !== 'urbano' && feature.properties.estado_simulacion !== estadoSimulacion.pincelEstadoObjetivo) {
+                aplicarEstadoHexagono(layer, estadoSimulacion.pincelEstadoObjetivo);
+            }
         }
     });
 }
 
-// Control del estado del ratón para la brocha
-map.on('mousedown', () => estadoSimulacion.mousePresionado = true);
-map.on('mouseup', () => estadoSimulacion.mousePresionado = false);
+// Control del estado global del ratón para la brocha
+map.on('mousedown', () => {
+    estadoSimulacion.mousePresionado = true;
+});
+
+// Listener en ventana para capturar mouseup incluso si sale del contenedor del mapa
+window.addEventListener('mouseup', () => {
+    estadoSimulacion.mousePresionado = false;
+});
 
 // ==========================================
 // 6. EVENTOS DE LA INTERFAZ (UI)
 // ==========================================
 // Slider de Densidad
-document.getElementById('density-slider').addEventListener('input', (e) => {
-    estadoSimulacion.densidad = parseInt(e.target.value);
-    document.getElementById('density-value').innerText = estadoSimulacion.densidad;
-    if (capaHexagonos) recalcularImpacto(); // Recalcular en tiempo real al mover el slider
-});
+const densitySlider = document.getElementById('density-slider');
+const densityValue = document.getElementById('density-value');
+
+if (densitySlider) {
+    densitySlider.addEventListener('input', (e) => {
+        estadoSimulacion.densidad = parseInt(e.target.value, 10);
+        if (densityValue) densityValue.innerText = estadoSimulacion.densidad;
+        recalcularImpacto();
+    });
+}
 
 // Botones de Herramientas
-document.getElementById('btn-click').addEventListener('click', (e) => {
-    estadoSimulacion.modoBrocha = false;
-    e.target.classList.add('active');
-    document.getElementById('btn-brush').classList.remove('active');
-    map.dragging.enable(); // Permitir arrastrar el mapa
-});
+const btnClick = document.getElementById('btn-click');
+const btnBrush = document.getElementById('btn-brush');
+const btnReset = document.getElementById('btn-reset');
 
-document.getElementById('btn-brush').addEventListener('click', (e) => {
-    estadoSimulacion.modoBrocha = true;
-    e.target.classList.add('active');
-    document.getElementById('btn-click').classList.remove('active');
-    map.dragging.disable(); // Desactivar arrastre del mapa para pintar cómodamente
-});
-
-// Botón Reiniciar
-document.getElementById('btn-reset').addEventListener('click', () => {
-    capaHexagonos.eachLayer((layer) => {
-        layer.feature.properties.estado_simulacion = 'original';
-        layer.setStyle(obtenerEstiloHexagono(layer.feature));
+if (btnClick && btnBrush) {
+    btnClick.addEventListener('click', () => {
+        estadoSimulacion.modoBrocha = false;
+        btnClick.classList.add('active');
+        btnBrush.classList.remove('active');
+        map.dragging.enable();
     });
-    recalcularImpacto();
-});
+
+    btnBrush.addEventListener('click', () => {
+        estadoSimulacion.modoBrocha = true;
+        btnBrush.classList.add('active');
+        btnClick.classList.remove('active');
+        map.dragging.disable();
+    });
+}
+
+// Botón Reiniciar Simulación
+if (btnReset) {
+    btnReset.addEventListener('click', () => {
+        if (capaHexagonos) {
+            capaHexagonos.eachLayer((layer) => {
+                layer.feature.properties.estado_simulacion = 'original';
+                layer.setStyle(obtenerEstiloHexagono(layer.feature));
+            });
+        }
+
+        // Restablecer slider
+        estadoSimulacion.densidad = 30;
+        if (densitySlider) densitySlider.value = 30;
+        if (densityValue) densityValue.innerText = '30';
+
+        recalcularImpacto();
+    });
+}
 
 // ==========================================
 // 7. CARGA DE DATOS (GEOJSON)
 // ==========================================
-// Reemplaza 'datos.geojson' con la ruta de tu archivo exportado
-fetch('datos.geojson')
-    .then(response => response.json())
+const statusOverlay = document.getElementById('map-status');
+
+fetch('hexagonos_app.geojson')
+    .then(response => {
+        if (!response.ok) {
+            throw new Error(`HTTP ${response.status} - No se pudo encontrar hexagonos_app.geojson`);
+        }
+        return response.json();
+    })
     .then(data => {
         capaHexagonos = L.geoJSON(data, {
             style: obtenerEstiloHexagono,
             onEachFeature: onEachFeature
         }).addTo(map);
 
-        // Ajustar el mapa para que encuadre todos los hexágonos
-        map.fitBounds(capaHexagonos.getBounds());
+        // Ajustar el mapa para que encuadre todos los hexágonos con margen
+        map.fitBounds(capaHexagonos.getBounds(), { padding: [20, 20] });
+
+        // Ocultar indicador de carga
+        if (statusOverlay) {
+            statusOverlay.style.display = 'none';
+        }
 
         // Cálculo inicial
         recalcularImpacto();
     })
-    .catch(error => console.error('Error al cargar el GeoJSON:', error));
+    .catch(error => {
+        console.error('Error al cargar el GeoJSON:', error);
+        if (statusOverlay) {
+            statusOverlay.innerHTML = `<div class="status-error">
+                <p>⚠️ <strong>Error al cargar los datos espaciales</strong></p>
+                <p style="font-size: 12px; margin-top: 6px;">${error.message}</p>
+            </div>`;
+        }
+    });

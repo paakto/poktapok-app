@@ -58,15 +58,45 @@
                     <div class="kpi-value danger"><span id="kpi-mangrove-lost">0</span> m²</div>
                 </div>
             </section>
+            <section class="control-group legend-group">
+                <h2>4. Leyenda de Cobertura</h2>
+                <div class="legend-items">
+                    <div class="legend-item">
+                        <span class="legend-color legend-urbano"></span>
+                        <span class="legend-label">Zona Urbana Existente</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-verde"></span>
+                        <span class="legend-label">Área Verde General</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-manglar"></span>
+                        <span class="legend-label">Manglar Protegido</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-inundable"></span>
+                        <span class="legend-label">Zona Inundable</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="legend-color legend-impacto"></span>
+                        <span class="legend-label">Nueva Zona Urbanizada</span>
+                    </div>
+                </div>
+            </section>
         </aside>
 
         <!-- Contenedor del Mapa -->
-        <main id="map" class="map-container"></main>
+        <main id="map" class="map-container">
+            <div id="map-status" class="map-status-overlay">
+                <div class="spinner"></div>
+                <p>Cargando datos espaciales...</p>
+            </div>
+        </main>
     </div>
 
     <!-- Leaflet JS -->
     <script src="https://unpkg.com/leaflet@1.9.4/dist/leaflet.js"></script>
     <!-- Lógica de la aplicación -->
-    <!-- <script src="app.js"></script> -->
+    <script src="app.js"></script>
 </body>
 </html>
