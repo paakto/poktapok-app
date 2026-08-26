@@ -46,29 +46,26 @@ let capaHexagonos; // Guardará nuestra capa GeoJSON
 // ==========================================
 function obtenerEstiloHexagono(feature) {
     let colorFondo = COLORES.verde_base;
-    let opacidad = 0.5;
+    let opacidad = 0.6; // Opacidad estándar un poco más alta
 
-    // Si ya era urbano originalmente
     if (feature.properties.tipo_actual === 'urbano') {
         colorFondo = COLORES.urbano_existente;
-        opacidad = 0.45;
-    }
-    // Si era verde pero el usuario lo ha "urbanizado" en la simulación
-    else if (feature.properties.estado_simulacion === 'urbanizado') {
+        opacidad = 0.4;
+    } else if (feature.properties.estado_simulacion === 'urbanizado') {
         colorFondo = COLORES.impacto_nuevo;
-        opacidad = 0.75; // Resaltar el impacto de desarrollo
-    }
-    // Variaciones visuales para los tipos de verde originales
-    else if (feature.properties.tipo_actual === 'verde_manglar') {
-        opacidad = 0.70;
+        opacidad = 0.7; 
+    } else if (feature.properties.tipo_actual === 'verde_manglar') {
+        colorFondo = COLORES.verde_manglar; // Asignamos el nuevo color oscuro
+        opacidad = 0.7;
     } else if (feature.properties.tipo_actual === 'verde_inundable') {
-        opacidad = 0.40;
+        colorFondo = COLORES.verde_inundable; // Asignamos el nuevo color claro
+        opacidad = 0.6;
     }
 
     return {
         fillColor: colorFondo,
         weight: 1,
-        color: '#ffffff', // Borde blanco sutil
+        color: '#ffffff', 
         fillOpacity: opacidad
     };
 }
