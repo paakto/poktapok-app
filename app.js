@@ -9,9 +9,9 @@ const POBLACION_ACTUAL_URBANA = 8500; // Población base actual de PokTaPok
 // Paleta de colores institucionales
 const COLORES = {
     urbano_existente: '#999999',
-    verde_base: '#36b4a1',       // Para área verde general
-    verde_manglar: '#145c50',    // Un verde mucho más oscuro para el manglar protegido
-    verde_inundable: '#8dd3c7',  // Un verde/celeste muy pálido para zonas inundables
+    verde_base: '#35b4a1',       // Para área verde general
+    verde_manglar: '#086955',    // Un verde mucho más oscuro para el manglar protegido
+    verde_inundable: '#afdbd8',  // Un verde/celeste muy pálido para zonas inundables
     impacto_nuevo: '#e3057f'
 };
 
