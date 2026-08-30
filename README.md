@@ -9,7 +9,7 @@
 
 ## 📌 ¿Qué es esta herramienta?
 
-Este **Simulador de Uso de Suelo** es una aplicación web interactiva diseñada para la asociación de vecinos de PokTaPok en Cancún. Su propósito principal es facilitar el diálogo participativo sobre el futuro del antiguo campo de golf del barrio, permitiendo a cualquier persona, sin necesidad de conocimientos técnicos previos, visualizar y comprender los impactos ambientales y urbanos que tendría un cambio en el uso del suelo.
+Este **[Simulador de Uso de Suelo](https://paakto.github.io/poktapok-app/)** es una aplicación web interactiva diseñada para la asociación de vecinos de PokTaPok en Cancún. Su propósito principal es facilitar el diálogo participativo sobre el futuro del antiguo campo de golf del barrio, permitiendo a cualquier persona, sin necesidad de conocimientos técnicos previos, visualizar y comprender los impactos ambientales y urbanos que tendría un cambio en el uso del suelo.
 
 A través de una interfaz sencilla tipo "juego de simulación", los usuarios pueden modelar escenarios de desarrollo urbano y observar en tiempo real cómo estas decisiones afectan la calidad de vida y el entorno natural.
 
